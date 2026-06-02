@@ -1,0 +1,48 @@
+services:
+  # 1. Base de datos de Desarrollo
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: template-postgres-dev
+    environment:
+      POSTGRES_USER: ${DB_USER} # 👈 Trae el usuario del .env
+      POSTGRES_PASSWORD: ${DB_PASSWORD} # 👈 Trae la contraseña del .env
+      POSTGRES_DB: ${DB_NAME} # 👈 Trae el nombre del .env
+    ports:
+      - '${DB_PORT}:5432' # 👈 Mapea el puerto dinámicamente
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+
+  # 2. Base de datos aislada para Testing
+  postgres-test-db:
+    image: postgres:16-alpine
+    container_name: template-postgres-test
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: nestAppTest # Mantenemos el de test separado
+    ports:
+      - '5433:5432'
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+
+  # 3. Nuestra aplicación de NestJS
+  nestjs-app:
+    build: .
+    container_name: template-nestjs-app
+    ports:
+      - '${PORT}:${PORT}' # 👈 Usa el puerto del .env (ej: 3000:3000)
+    environment:
+      - PORT=${PORT}
+      - DATABASE_URL=${DATABASE_URL} # 👈 Inyecta la URL armada del .env
+      - PRODUCTS_MICROSERVICES_HOST=${PRODUCTS_MICROSERVICES_HOST}
+      - PRODUCTS_MICROSERVICES_PORT=${PRODUCTS_MICROSERVICES_PORT}
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - postgres-db
+      - postgres-test-db
+
+volumes:
+  postgres_dev_data:
+  postgres_test_data:
