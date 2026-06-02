@@ -106,7 +106,7 @@ Siga estos pasos para clonar, ejecutar y testear el template en su máquina loca
 
 ### Pasos para Levantar la Aplicación
 
-1.  cp .env.template .env*Nota: Asegúrese de validar que las credenciales de la base de datos y el JWT_SECRET se correspondan con sus necesidades locales.*
+1.  .env.template tiene la guia para crear las variables en .env _Nota: Asegúrese de validar que las credenciales de la base de datos y el JWT_SECRET se correspondan con sus necesidades locales._
 
 2.  docker compose up --build
 
